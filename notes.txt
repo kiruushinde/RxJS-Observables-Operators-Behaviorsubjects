@@ -1,0 +1,229 @@
+#️⃣ RxJS 
+
+✨ what is reactive programming ?
+    -it is one the technique to build software applications
+    - how our app will react to the changes and how it will handle the data strams coming or receiving when we make api call.
+
+✨ what is RxJS ?
+    - it is the library which helps us in making async call and implement callback mechanisms easily by using observables.
+
+what it has ? 3 main things 
+    1. observables
+    2. satellite data types (observers, schedulars, subjects)
+    3. operators (what do you do with the data is operators)
+        - array methods
+        (map, reduce, filter, etc.)
+    
+
+✨ Observables 
+    - you get continuous data streams over a period of time
+
+    e.g. consider example of e-cart where user comes and places order, now the status of order will keep changing as below
+
+    orderStatus = order placed
+    orderStatus = order received
+    orderStatus = order confirmed
+    orderStatus = order shipped
+    orderStatus = order completed
+    orderStatus = order changed
+    orderStatus = order cancelled
+    and so on..
+
+    so, this changing behaviour of data is nothing but data streams and it refers to observable.
+
+✨ Subscriber 
+    - it is the one who will listen to that observable for the data change.
+
+    e.g. consider example of youtube, I have my YT channel where I post videos. think this as a observable.
+
+    and you Subscribe to my channel so that you will be getting all the notifications.
+
+    this how Subscriber works..
+
+
+✨ operators 
+
+    let say I make posts on youtube, but what kind of posts 
+    - videos
+    - shorts
+    - community posts 
+
+    so, let say you are operator, then you will filter what do you want to consume on my channel, 
+    sometimes it might be shorts, sometime it can be community posts
+
+    so, operators behave like methods in array 
+     1. filter
+     2. map
+     3. reduce etc.
+    
+--------------------------------------
+
+#️⃣ Installation
+
+    if you are working in angular then it will be prebuilt in your app.
+    check package.json file 
+
+    otherwise 
+
+    > npm install rxjs 
+
+    (Note: you can use rxjs outside of your angular project, it is not only limited upto the angular, it exists outside of it.)
+
+---------------------------------------
+
+#️⃣ Observables
+    - they emits the data over a period of time 
+    - they need to be subscribed 
+    - it mianly has 3 methods
+        1. next
+        2. complete
+        3. error 
+    
+    users$ = observable<string> | undefined;
+
+    we created varibale users$ which is of type observable..
+
+    // observable takes one function and returns or emits values
+    this.users$ = new Observable(function (observer) {
+      try {
+        observer.next('Kiran');
+        observer.next('Utkuu');
+        observer.next('Meow');
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    // we need to subscribe that observable.
+    this.users$.subscribe((res) => {
+      console.log(res);
+    });
+
+    this is how we create an observable..
+
+-------------------------------------------------
+
+#️⃣ Operators 
+
+    - it is a pure function 
+    (means always produces same output for same input and it has no side effects.. means it is never changing the global varibales).
+
+    1. creation
+    2. mathematical
+    3. join
+    4. transformation
+    5. filtering 
+    6. utility
+    7. conditional
+    8. multicasting
+
+
+📍 Of operator
+    this operator creates an observable by taking string, array and object as an input.. 
+    if you pass any of above to Of operator then it will be converted to the observable.
+
+    --> array of strings 
+    studentName = ['kiran', 'meow', 'utkuuu'];
+    
+    studentNames$: Observable<string[]> = of(this.studentName);
+
+    you need to subsscribe to this observable
+
+    ngOnInit(): void {
+    // you always need to subscribe observable
+    this.studentNames$.subscribe((data) => {
+      console.log('creating observable from array of strings : ', data);
+    });
+    }
+
+
+📍 from operator
+    this also creates an observable from an array or array-like object, promise or an iterable objet
+
+    // 📌 observable from array but using from operator
+    deptartments = ['cse', 'it', 'mechanical'];
+    depts$: Observable<string> = from(this.deptartments);
+
+
+📍 pipe 
+
+    input: [1, 2, 3, 4]
+    output: [2, 4, 6, 8]
+
+    pipe is the function which is used to transfrom the data, it accepts the input value and returns the modified value.
+
+    you can write functions like map, filter inside that, and it returns value which is again in the form ob observable.
+
+    numbers = [1, 2, 3, 4];
+    numbers$: Observable<any> = from(this.numbers).pipe(
+        map((val: any) => val * 2)
+    );
+
+    now subscribe to this.
+
+    this.numbers$.subscribe((data) => {
+      console.log('map method ', data);
+    });
+
+
+📍 pipe and map
+    users = [
+        { id: 1, name: 'kiran' },
+        { id: 2, name: 'Utkuu' },
+    ];
+
+    user$ = of(this.users);
+    usernames$ = this.user$.pipe(map((users) => users.map((uname) => uname)));
+                                      ⬆️
+                                    here, you will get access to the object array 
+                                    and next you can get individual object
+
+    👉 if you want to use it, then make use of async pipe 
+    <p *ngFor="let user of usernames$ | async">{{user.name}}</p>
+
+
+📍 filter 
+  when you want filter out some of the values 
+
+  // 📌 filter
+  array = [1, 1, 1, 2, 3, 2, 3, 10, 8, 6];
+  filterdArray$ = from(this.array).pipe(filter((num) => num % 2 == 0));
+  arr: any = [];
+  
+  subscribe it 
+
+  this.filterdArray$.subscribe((data) => {
+    this.arr.push(data);
+  });
+
+  console.log('filterd array is : ', this.arr);
+
+  Done ✅
+
+📍 behaviourSubject
+
+    it is another one of the important method in angular, when you are dealing with the api's and you want to store the data then you can use this.
+
+    you can subscribe to the api, and undate it here.
+
+    // specify what it will accept {id, name} with their types, and default parameter should be null/[]/etc
+    1. mySub$ = new BehaviorSubject<{ id: string; name: string } | null>(null);
+
+    //when you do this, then mySub$ will contain the data as observable.
+    2. this.mySub$.next({ id: '1', name: 'kiran' });
+
+    // and when you actually subscribe to it, you will get the data
+    
+    this.mySub$.subscribe((data) => {
+      console.log('current user is : ', data);
+    });
+
+    👉 when you want to use it in template then
+    <p *ngIf="mySub$| async as user">
+        {{user.id}}
+        {{user.name}}
+    </p>
+
+    (You can now subscribe to behaviourSubject to aywhere in your components and it will be reflected to everywhere..data is updated basically)
+
+
